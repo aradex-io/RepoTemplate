@@ -155,5 +155,8 @@ call these, not raw tool invocations.
 - `AGENTS.md` — tool-neutral version of these rules.
 - `VERSIONING.md` — Conventional Commits + SemVer + release process in detail.
 - `CONTRIBUTING.md` — human contributor guide.
-- `docs/architecture/overview.md` — system map.
+- `docs/` — the wiki; low-level reference for every mechanism. Start at
+  `docs/README.md`, then `docs/guide/` (plan review, version control, CI/CD,
+  branch protection, scripts, agents).
+- `docs/architecture/overview.md` — system map (yours to fill in).
 - `docs/adr/` — why decisions were made.

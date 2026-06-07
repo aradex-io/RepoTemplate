@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `docs/` wiki: a low-level reference under `docs/guide/` (plan review, version
+  control & changelog, CI/CD & releases, branch protection, scripts, agents),
+  indexed by `docs/README.md`.
+
+### Changed
+- Streamlined the README — removed repetition and moved deep detail into the wiki.
+
 ## [0.1.0] - 2026-06-07
 
 ### Added
