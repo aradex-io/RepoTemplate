@@ -75,6 +75,35 @@ The template is intentionally generic. Update these repo-specific bits once:
 - [ ] `CHANGELOG.md` — replace the `OWNER/REPO` link reference with your repo.
 - [ ] `scripts/bootstrap.sh`, `scripts/test.sh`, `scripts/lint.sh` — see note below.
 - [ ] `docs/architecture/overview.md` — describe your actual system.
+- [ ] **Branch protection** — apply the ruleset (see below). Not copied by GitHub
+      when you create a repo from a template, so it's a required one-time step.
+
+### Default branch & branch protection
+
+The template's default branch is **`main`**, so any repo you create from it via
+**"Use this template"** starts on `main` from the first commit.
+
+Branch **rules** aren't carried over by GitHub, so apply them once. The policy
+lives in [`.github/rulesets/main-branch-protection.json`](.github/rulesets/main-branch-protection.json)
+and enforces what `CLAUDE.md` §2 already mandates on the default branch:
+
+- no direct pushes — changes land via pull request;
+- required status checks must pass (`Lint`, `Test`, `Conventional Commits`,
+  `Changelog updated`);
+- no force-pushes, no branch deletion, linear history.
+
+Apply it either way:
+
+```bash
+# Option A — GitHub CLI (sets main as default + imports the ruleset):
+scripts/setup-branch-protection.sh            # or: scripts/setup-branch-protection.sh owner/repo
+
+# Option B — UI: Settings -> Rules -> Rulesets -> New -> Import a ruleset ->
+#            pick .github/rulesets/main-branch-protection.json
+```
+
+> Solo maintainer? The ruleset requires a PR but **0** approvals by default, so you
+> won't lock yourself out. Bump `required_approving_review_count` for teams.
 
 > **Heads-up on the script stubs.** `bootstrap.sh`, `test.sh`, and `lint.sh` ship
 > as no-op stubs that **exit 0** so CI is green out of the box. Until you wire

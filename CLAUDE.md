@@ -29,10 +29,13 @@ the conflict and stop — do not silently override it.
 
 These are hard requirements. CI enforces several of them; the rest are on you.
 
-- **Never commit to `main`/`master` directly.** All work happens on a branch:
-  `feat/<slug>`, `fix/<slug>`, `chore/<slug>`, `docs/<slug>`, or the
+- **`main` is the default branch and is protected.** All work happens on a
+  branch: `feat/<slug>`, `fix/<slug>`, `chore/<slug>`, `docs/<slug>`, or the
   session-assigned `claude/<task>` branch. Create the branch before the first
-  edit.
+  edit. Never commit to `main`/`master` directly — the ruleset in
+  `.github/rulesets/main-branch-protection.json` blocks direct pushes and
+  force-pushes, requires green CI, and forbids deleting `main` (apply it once via
+  `scripts/setup-branch-protection.sh`).
 - **Conventional Commits, always.** Format: `type(scope): subject` in the
   imperative mood, ≤ 72 chars. Allowed types: `feat`, `fix`, `docs`, `style`,
   `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`. Breaking changes
