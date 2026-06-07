@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   control & changelog, CI/CD & releases, branch protection, scripts, agents),
   indexed by `docs/README.md`.
 
+- `scripts/publish-wiki.sh` (+ `scripts/lib/wiki_render.py`): publish the `docs/`
+  wiki to the GitHub repository Wiki, regenerated from `docs/` with link rewriting
+  and a generated sidebar — `docs/` stays the single source of truth.
+
 ### Changed
 - Streamlined the README — removed repetition and moved deep detail into the wiki.
 

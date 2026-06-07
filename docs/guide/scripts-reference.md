@@ -55,6 +55,22 @@ Set `main` as default and apply the ruleset via `gh`. Full detail in
 - **Args:** `owner/repo` (default: current repo via `gh`).
 - **Requires:** `gh` with admin. **Exit:** `0` ok · `1` ruleset file missing · `127` no `gh`.
 
+## `publish-wiki.sh [owner/repo]`
+
+Publish this `docs/` wiki to the repository's **GitHub Wiki** (a separate
+`OWNER/REPO.wiki.git` repo). Regenerates the wiki pages from `docs/` via
+`scripts/lib/wiki_render.py` — flat page names, links rewritten (intra-wiki links
+to page slugs, repo-file links to `blob/<branch>` URLs), plus `_Sidebar.md` and
+`_Footer.md` — then commits and pushes. `docs/` stays the single source of truth;
+nothing is duplicated in the code repo.
+
+- **Args:** `owner/repo` (default: inferred from `origin`).
+- **Env:** `WIKI_REMOTE` (SSH/alt URL), `WIKI_LINK_BRANCH` (default `main`),
+  `DRY_RUN=1` (build pages, skip push).
+- **Prereqs:** the wiki must be initialized once via the GitHub UI; git auth that
+  can push to the wiki.
+- **Exit:** `0` ok / up to date · `1` wiki not clonable · `2` can't resolve repo.
+
 ## Conventions for new scripts
 
 - Put automation here and call it from CI — keep CI YAML thin.
