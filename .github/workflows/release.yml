@@ -23,9 +23,11 @@ jobs:
           # Pull the body of the matching '## [x.y.z]' section from CHANGELOG.md.
           awk -v ver="$version" '
             $0 ~ "^## \\[" ver "\\]" {capture=1; next}
-            capture && /^## \[/ {exit}
+            capture && (/^## \[/ || /^\[[^]]+\]:/) {exit}
             capture {print}
           ' CHANGELOG.md > release-notes.md
+          # Trim leading/trailing blank lines.
+          sed -i -e '/./,$!d' release-notes.md
           if [[ ! -s release-notes.md ]]; then
             echo "No CHANGELOG.md section for $version — add one before tagging." >&2
             exit 1

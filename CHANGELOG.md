@@ -7,24 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-06-07
+
 ### Added
-- Initial repository template: CLAUDE.md / AGENTS.md operating contract, Codex
-  plan-review workflow (`scripts/codex-review.sh`), `.claude/` agents and slash
-  commands, CI/CD workflows, changelog + versioning policy, and the base
-  `src/ tests/ docs/ scripts/ offline/` folder structure.
-- Default branch is `main`; importable branch-protection ruleset
-  (`.github/rulesets/main-branch-protection.json`) plus
+- Operating contract for humans and AI agents (`CLAUDE.md` + tool-neutral
+  `AGENTS.md`): think-before-coding, simplicity-first, surgical changes, strict
+  branch-only version control, and a mandatory changelog.
+- Plan → review → implement workflow. Non-trivial work is planned in
+  `docs/plans/` and reviewed by `scripts/codex-review.sh`, which appends a
+  `## Appendix: Plan Review` to the plan. Backends: **`codex exec`** (preferred,
+  read-only, non-interactive — never the Codex bridge/MCP), a fallback reviewer
+  CLI via `REVIEW_FALLBACK_CMD` (e.g. `advisor`), or the `plan-reviewer` agent.
+- `.claude/` harness: shared `settings.json` with a SessionStart hook; agents
+  (`planner`, `codex-reviewer`, `plan-reviewer`, `implementer`,
+  `changelog-keeper`); slash commands (`/plan`, `/codex-review`, `/release`).
+- CI/CD: `ci` (lint, test, Conventional-Commit linting), `changelog` gate, and
+  tag-driven `release` workflows; PR/issue templates; inert `CODEOWNERS`.
+- `main` is the default branch, with an importable branch-protection ruleset
+  (`.github/rulesets/main-branch-protection.json`) and
   `scripts/setup-branch-protection.sh` to set the default branch and apply it.
-- Plan-review fallbacks when Codex is absent: a fallback reviewer CLI via
-  `REVIEW_FALLBACK_CMD` (e.g. `advisor`) and a `plan-reviewer` agent — both
-  append the same `## Appendix: Plan Review` section.
-- Visually styled README: short description, core requirements (Codex CLI +
-  token), usage workflow with diagram, and the review-fallback reference.
+- Base layout — `src/ tests/ docs/ scripts/ offline/` (git-ignored scratch) —
+  plus `VERSIONING.md`, `CONTRIBUTING.md`, MIT `LICENSE`, `.gitignore`,
+  `.editorconfig`, and a visually styled `README.md`.
 
-### Changed
-- Plan-review appendix renamed `## Appendix: Codex Review` → `## Appendix: Plan
-  Review` so it's accurate across review backends (Codex remains the default).
-
-<!-- Update OWNER/REPO to your repository, or switch to a compare link after the
-     first tagged release, e.g. .../compare/v0.1.0...HEAD -->
-[Unreleased]: https://github.com/OWNER/REPO/commits/main
+[Unreleased]: https://github.com/OWNER/REPO/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/OWNER/REPO/releases/tag/v0.1.0
