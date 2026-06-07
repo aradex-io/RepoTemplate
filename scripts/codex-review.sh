@@ -1,13 +1,25 @@
 #!/usr/bin/env bash
 #
-# codex-review.sh — Run an OpenAI Codex review of an implementation plan and
-# append the review to the plan file as a "## Appendix: Codex Review" section.
+# codex-review.sh — Review an implementation plan and append the review to the
+# plan file as a "## Appendix: Plan Review" section.
 #
-# Per CLAUDE.md §4, plan reviews MUST be produced this way:
-#   * via `codex exec` (non-interactive, one-shot, read-only sandbox)
-#   * written as an APPENDIX to the plan markdown file (version-controlled)
-#   * NOT as an interactive Codex session
-#   * NOT via the Codex "bridge" / Codex MCP server / IDE integration
+# Per CLAUDE.md §4, plan reviews MUST be produced as an APPENDIX written to the
+# plan markdown file (version-controlled), via a NON-interactive, READ-ONLY
+# reviewer — never an interactive Codex session and never the Codex "bridge" /
+# Codex MCP / IDE integration.
+#
+# Review backends, tried in order (override with REVIEW_BACKEND=codex|advisor|none):
+#   1. codex     — `codex exec` (OpenAI Codex CLI). Preferred.
+#   2. advisor   — fallback CLI: $REVIEW_FALLBACK_CMD (default "advisor") that
+#                  reads the prompt on stdin and writes the review to stdout.
+#   3. (none)    — no review CLI found: stop and tell the caller to install one
+#                  or run the `plan-reviewer` agent, which appends the appendix
+#                  itself. We never fabricate a review.
+#
+# Env:
+#   CODEX_REVIEW_MODEL   model for codex exec       (default: gpt-5.3-codex)
+#   REVIEW_BACKEND       force a backend            (default: auto)
+#   REVIEW_FALLBACK_CMD  fallback reviewer command  (default: advisor)
 #
 # Usage:
 #   scripts/codex-review.sh docs/plans/2026-06-07-my-feature.md
@@ -19,35 +31,26 @@ if [[ -z "${PLAN_FILE}" ]]; then
   echo "Usage: scripts/codex-review.sh <path-to-plan.md>" >&2
   exit 2
 fi
-if [[ ! -f "${PLAN_FILE}" ]]; then
-  echo "error: plan file not found: ${PLAN_FILE}" >&2
-  exit 1
-fi
-if ! command -v codex >/dev/null 2>&1; then
-  echo "error: 'codex' CLI not found. Install the OpenAI Codex CLI:" >&2
-  echo "       npm install -g @openai/codex   (or see https://developers.openai.com/codex/cli)" >&2
-  exit 127
-fi
+[[ -f "${PLAN_FILE}" ]] || { echo "error: plan file not found: ${PLAN_FILE}" >&2; exit 1; }
 
-# Model is overridable; default to a current Codex model.
 CODEX_MODEL="${CODEX_REVIEW_MODEL:-gpt-5.3-codex}"
+REVIEW_BACKEND="${REVIEW_BACKEND:-auto}"
+REVIEW_FALLBACK_CMD="${REVIEW_FALLBACK_CMD:-advisor}"
 
-TMP_REVIEW="$(mktemp -t codex-review.XXXXXX)"
-cleanup() { rm -f "${TMP_REVIEW}"; }
-trap cleanup EXIT
+TMP_REVIEW="$(mktemp -t plan-review.XXXXXX)"
+trap 'rm -f "${TMP_REVIEW}"' EXIT
 
-read -r -d '' PROMPT <<'EOF' || true
+read -r -d '' INSTRUCTIONS <<'EOF' || true
 You are a principal engineer performing a rigorous, skeptical design review of
-the implementation plan provided below. Your job is to find problems before any
-code is written.
+the implementation plan below. Find problems before any code is written.
 
 Review for: correctness, completeness, hidden complexity, security, data/privacy
 risk, failure modes, testability, rollout/rollback safety, and adherence to the
 repository's CLAUDE.md rules (strict version control, mandatory changelog,
 surgical/simple changes).
 
-Output ONLY GitHub-flavored Markdown suitable to be pasted verbatim as an
-appendix under a plan. Do not edit any files. Use exactly this structure:
+Output ONLY GitHub-flavored Markdown to be pasted verbatim as an appendix. Do
+not edit any files. Use exactly this structure:
 
 ### Verdict
 One of: Approve / Approve with changes / Request changes — plus one sentence why.
@@ -56,48 +59,75 @@ One of: Approve / Approve with changes / Request changes — plus one sentence w
 Bullets.
 
 ### Issues
-Numbered, ordered by severity (Blocker > Major > Minor). Each: the problem, why
-it matters, and a concrete recommended fix.
+Numbered, by severity (Blocker > Major > Minor): problem, why it matters, fix.
 
 ### Test coverage gaps
-Bullets — what is untested or under-specified.
+Bullets.
 
 ### Open questions
-Bullets — what the author must clarify.
+Bullets.
 
 --- BEGIN PLAN ---
 EOF
 
-# Build the full prompt: instructions + the plan contents as context.
-FULL_PROMPT="${PROMPT}"$'\n'"$(cat "${PLAN_FILE}")"$'\n'"--- END PLAN ---"
+PROMPT="${INSTRUCTIONS}"$'\n'"$(cat "${PLAN_FILE}")"$'\n'"--- END PLAN ---"
 
-echo ">> Running codex exec (read-only) on ${PLAN_FILE} ..." >&2
+# Resolve which backend to use.
+resolve_backend() {
+  case "${REVIEW_BACKEND}" in
+    codex|advisor|none) echo "${REVIEW_BACKEND}" ;;
+    auto)
+      if command -v codex >/dev/null 2>&1; then echo codex
+      elif command -v "${REVIEW_FALLBACK_CMD}" >/dev/null 2>&1; then echo advisor
+      else echo none; fi ;;
+    *) echo "${REVIEW_BACKEND}" ;;
+  esac
+}
+BACKEND="$(resolve_backend)"
 
-# `codex exec`  : non-interactive, one-shot.
-# --sandbox read-only         : Codex may read the repo but MUST NOT modify files.
-# --skip-git-repo-check       : allow running regardless of git state.
-# --output-last-message FILE  : capture ONLY the final review message (stdout/stderr carries progress).
-codex exec \
-  --model "${CODEX_MODEL}" \
-  --sandbox read-only \
-  --skip-git-repo-check \
-  --output-last-message "${TMP_REVIEW}" \
-  "${FULL_PROMPT}" >&2
+case "${BACKEND}" in
+  codex)
+    command -v codex >/dev/null 2>&1 || { echo "error: REVIEW_BACKEND=codex but 'codex' not found." >&2; exit 127; }
+    echo ">> reviewing ${PLAN_FILE} via codex exec (read-only)..." >&2
+    codex exec \
+      --model "${CODEX_MODEL}" \
+      --sandbox read-only \
+      --skip-git-repo-check \
+      --output-last-message "${TMP_REVIEW}" \
+      "${PROMPT}" >&2
+    LABEL="codex exec (model: ${CODEX_MODEL})"
+    ;;
+  advisor)
+    command -v "${REVIEW_FALLBACK_CMD}" >/dev/null 2>&1 || { echo "error: fallback reviewer '${REVIEW_FALLBACK_CMD}' not found." >&2; exit 127; }
+    echo ">> codex unavailable — reviewing via fallback CLI '${REVIEW_FALLBACK_CMD}'..." >&2
+    printf '%s\n' "${PROMPT}" | "${REVIEW_FALLBACK_CMD}" > "${TMP_REVIEW}"
+    LABEL="${REVIEW_FALLBACK_CMD} (fallback CLI)"
+    ;;
+  none)
+    cat >&2 <<MSG
+error: no review CLI available.
+  Fix one of:
+    * install the OpenAI Codex CLI:  npm install -g @openai/codex   (then 'codex login' or set OPENAI_API_KEY)
+    * provide a fallback reviewer:   REVIEW_FALLBACK_CMD=<your-cli> scripts/codex-review.sh ${PLAN_FILE}
+    * run the 'plan-reviewer' agent in Claude Code — it reviews this plan and
+      appends the same '## Appendix: Plan Review' section (CLAUDE.md §4).
+MSG
+    exit 3
+    ;;
+  *)
+    echo "error: unknown REVIEW_BACKEND='${REVIEW_BACKEND}'" >&2; exit 2 ;;
+esac
 
-if [[ ! -s "${TMP_REVIEW}" ]]; then
-  echo "error: codex produced an empty review; not modifying ${PLAN_FILE}" >&2
-  exit 1
-fi
+[[ -s "${TMP_REVIEW}" ]] || { echo "error: reviewer produced an empty review; not modifying ${PLAN_FILE}" >&2; exit 1; }
 
 STAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 {
   printf '\n\n---\n\n'
-  printf '## Appendix: Codex Review (%s)\n\n' "${STAMP}"
-  printf '<!-- Generated by `codex exec` (read-only, non-interactive). Do not hand-edit this appendix. -->\n'
-  printf '<!-- Model: %s -->\n\n' "${CODEX_MODEL}"
+  printf '## Appendix: Plan Review (%s)\n\n' "${STAMP}"
+  printf '<!-- Generated by %s — read-only, non-interactive. Do not hand-edit this appendix. -->\n\n' "${LABEL}"
   cat "${TMP_REVIEW}"
   printf '\n'
 } >> "${PLAN_FILE}"
 
-echo ">> Appended Codex review to ${PLAN_FILE}" >&2
-echo ">> Review the appendix, resolve blockers, then implement (CLAUDE.md §4)." >&2
+echo ">> appended review (${LABEL}) to ${PLAN_FILE}" >&2
+echo ">> read the appendix, resolve blockers, then implement (CLAUDE.md §4)." >&2

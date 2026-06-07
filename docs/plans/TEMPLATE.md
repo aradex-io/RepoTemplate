@@ -41,6 +41,7 @@ Anything needing a human decision before/while implementing.
 <!--
 After writing this plan, run:
     scripts/codex-review.sh docs/plans/<this-file>.md
-It will append a "## Appendix: Codex Review" section below via `codex exec`
-(read-only). Resolve Blocker/Major issues before implementing (CLAUDE.md §4).
+It will append a "## Appendix: Plan Review" section below via `codex exec`
+(read-only), or a fallback reviewer / the plan-reviewer agent if Codex is not
+installed. Resolve Blocker/Major issues before implementing (CLAUDE.md §4).
 -->

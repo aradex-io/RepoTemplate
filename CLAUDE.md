@@ -79,15 +79,22 @@ Workflow:
 1. Write the plan to `docs/plans/<YYYY-MM-DD>-<slug>.md` using
    `docs/plans/TEMPLATE.md`. Cover: goal, approach, files touched, test strategy,
    risks, rollout.
-2. Run the Codex review:
+2. Run the review:
    ```bash
    scripts/codex-review.sh docs/plans/<YYYY-MM-DD>-<slug>.md
    ```
    This invokes **`codex exec`** (OpenAI Codex CLI, non-interactive, read-only
-   sandbox) and **appends the review to the plan file as a `## Appendix: Codex
+   sandbox) and **appends the review to the plan file as a `## Appendix: Plan
    Review` section.**
 3. **Read the appendix. Address blocking issues** in the plan (revise and, if the
    plan changed materially, re-run the review). Only then implement.
+
+**Fallback when Codex isn't installed** (the review still happens, still as an
+appendix, still read-only):
+- a fallback reviewer CLI via `REVIEW_FALLBACK_CMD` (e.g. `advisor`) — set it and
+  re-run the script; or
+- the **`plan-reviewer` agent**, which reads the plan and appends the same
+  `## Appendix: Plan Review` section itself.
 
 Hard constraints on how the review is produced — do not deviate:
 
