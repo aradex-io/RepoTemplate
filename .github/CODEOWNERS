@@ -1,0 +1,16 @@
+# Code owners — GitHub auto-requests these accounts for review on matching paths.
+#
+# This template ships with NO active owners so it works for anyone who clones or
+# "Use this template"s it (uncommented placeholder owners would raise "unknown
+# owner" errors). Uncomment and replace OWNER with real GitHub usernames/teams
+# (e.g. @your-org/maintainers) when you adopt the repo.
+
+# Default owner for everything
+# *                 @OWNER
+
+# Workflow & policy files warrant extra care
+# /.github/         @OWNER
+# /CLAUDE.md        @OWNER
+# /AGENTS.md        @OWNER
+# /VERSIONING.md    @OWNER
+# /scripts/         @OWNER

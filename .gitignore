@@ -1,0 +1,52 @@
+# --- Local scratch / offline workspace (never tracked) ----------------------
+# Everything under offline/ is local-only: experiments, scratch, large or
+# private data. Keep the folder (via its README) but ignore its contents.
+offline/*
+!offline/README.md
+
+# --- Secrets & environment --------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+*.local
+
+# --- OS / editor ------------------------------------------------------------
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*~
+
+# --- Logs & temp ------------------------------------------------------------
+*.log
+tmp/
+.tmp/
+.cache/
+
+# --- Language artifacts (uncomment / extend per project) --------------------
+# Node
+node_modules/
+dist/
+build/
+coverage/
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+# Go
+/bin/
+# Rust
+/target/
+
+# --- Claude Code local overrides --------------------------------------------
+.claude/settings.local.json

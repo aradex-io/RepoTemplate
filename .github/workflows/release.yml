@@ -1,0 +1,40 @@
+name: Release
+
+# Tag-driven release. Push a SemVer tag (e.g. v1.2.0) to cut a release with
+# notes derived from the matching CHANGELOG.md section.
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract changelog section for this tag
+        id: notes
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          # Pull the body of the matching '## [x.y.z]' section from CHANGELOG.md.
+          awk -v ver="$version" '
+            $0 ~ "^## \\[" ver "\\]" {capture=1; next}
+            capture && /^## \[/ {exit}
+            capture {print}
+          ' CHANGELOG.md > release-notes.md
+          if [[ ! -s release-notes.md ]]; then
+            echo "No CHANGELOG.md section for $version — add one before tagging." >&2
+            exit 1
+          fi
+          echo "Release notes:"; cat release-notes.md
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: release-notes.md
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false

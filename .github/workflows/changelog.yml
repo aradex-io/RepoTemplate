@@ -1,0 +1,25 @@
+name: Changelog
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+jobs:
+  changelog:
+    name: Changelog updated
+    runs-on: ubuntu-latest
+    # Honor a 'changelog: none' label for internal-only PRs.
+    if: "${{ !contains(github.event.pull_request.labels.*.name, 'changelog: none') }}"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check CHANGELOG.md was updated
+        env:
+          BASE_REF: origin/${{ github.base_ref }}
+        run: |
+          git fetch origin "${{ github.base_ref }}" --depth=50
+          ./scripts/check-changelog.sh "origin/${{ github.base_ref }}"
