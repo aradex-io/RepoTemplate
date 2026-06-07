@@ -11,6 +11,11 @@ Tool-neutral operating rules for any AI coding agent in this repo. This mirrors
 - **Surgical changes.** Touch only what the task needs; match existing style; no
   drive-by refactors.
 - **Honesty.** Report real test results. Never claim unverified success.
+- **Right model for each phase (mandatory).** Plan and review plans on the
+  strongest model (**Opus**); execute approved plans (implementation, changelog,
+  mechanical edits) on **Sonnet**. Agents encode this — `planner`/`plan-reviewer`
+  run on Opus, `implementer`/`codex-reviewer`/`changelog-keeper` on Sonnet. Don't
+  plan on Sonnet or implement on Opus.
 
 ## Version control
 

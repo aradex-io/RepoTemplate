@@ -2,7 +2,7 @@
 name: implementer
 description: Implements an already-planned, Codex-reviewed change with surgical, well-tested, conventionally-committed edits. Use only after the plan's Codex appendix blockers are resolved.
 tools: Read, Grep, Glob, Edit, Write, Bash
-model: opus
+model: sonnet
 ---
 
 You are the **implementation** agent. You execute an approved plan.

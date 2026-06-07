@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Streamlined the README — removed repetition and moved deep detail into the wiki.
+- Mandate model roles by phase: planning/plan-review on **Opus**, execution on
+  **Sonnet** (`CLAUDE.md` §1.6 + Definition of done, `AGENTS.md`, and the agents
+  guide). The `implementer` agent now runs on Sonnet instead of Opus.
 
 ## [0.1.0] - 2026-06-07
 

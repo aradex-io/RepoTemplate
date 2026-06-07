@@ -17,15 +17,16 @@ agent follows the same contract a human does.
 ## Agents — `.claude/agents/`
 
 Each agent is a focused role with a minimal toolset. They chain
-**plan → review → implement**:
+**plan → review → implement**. Per CLAUDE.md §1.6, **planning runs on Opus and
+execution runs on Sonnet** — each agent pins its `model` accordingly:
 
-| Agent | Tools | Does | Does not |
-|-------|-------|------|----------|
-| [`planner`](../../.claude/agents/planner.md) | Read, Grep, Glob, Bash, Write | Research, then write a grounded plan into `docs/plans/`. | Touch `src/` or implement. |
-| [`codex-reviewer`](../../.claude/agents/codex-reviewer.md) | Bash, Read | Run `scripts/codex-review.sh`; summarize the verdict/blockers; hand off to `plan-reviewer` on exit `3`. | Write the review itself or implement. |
-| [`plan-reviewer`](../../.claude/agents/plan-reviewer.md) | Read, Edit | **Fallback reviewer** with no CLI: review the plan and append the same appendix. | Implement; use an interactive Codex session or the bridge/MCP. |
-| [`implementer`](../../.claude/agents/implementer.md) | Read, Grep, Glob, Edit, Write, Bash | Implement an approved plan surgically, with tests + changelog. | Start before blockers are resolved; commit to `main`. |
-| [`changelog-keeper`](../../.claude/agents/changelog-keeper.md) | Read, Edit, Bash | Keep `CHANGELOG.md` honest; cut SemVer releases. | Invent entries. |
+| Agent | Model | Tools | Does | Does not |
+|-------|-------|-------|------|----------|
+| [`planner`](../../.claude/agents/planner.md) | **opus** | Read, Grep, Glob, Bash, Write | Research, then write a grounded plan into `docs/plans/`. | Touch `src/` or implement. |
+| [`codex-reviewer`](../../.claude/agents/codex-reviewer.md) | sonnet | Bash, Read | Run `scripts/codex-review.sh`; summarize the verdict/blockers; hand off to `plan-reviewer` on exit `3`. | Write the review itself or implement. |
+| [`plan-reviewer`](../../.claude/agents/plan-reviewer.md) | **opus** | Read, Edit | **Fallback reviewer** with no CLI: review the plan and append the same appendix. | Implement; use an interactive Codex session or the bridge/MCP. |
+| [`implementer`](../../.claude/agents/implementer.md) | sonnet | Read, Grep, Glob, Edit, Write, Bash | Implement an approved plan surgically, with tests + changelog. | Start before blockers are resolved; commit to `main`. |
+| [`changelog-keeper`](../../.claude/agents/changelog-keeper.md) | sonnet | Read, Edit, Bash | Keep `CHANGELOG.md` honest; cut SemVer releases. | Invent entries. |
 
 ## Slash commands — `.claude/commands/`
 

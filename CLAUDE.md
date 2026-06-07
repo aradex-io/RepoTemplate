@@ -24,6 +24,11 @@ the conflict and stop — do not silently override it.
    tree buildable, tested, documented, and version-controlled.
 5. **Be honest about state.** If tests fail, say so with output. If you skipped a
    step, say that. Never report "done" for work you did not verify.
+6. **Right model for each phase (mandatory).** Plan and review plans with the
+   strongest model — **Opus**. Execute approved, reviewed plans — implementation,
+   changelog edits, mechanical changes — with **Sonnet**. The shipped agents
+   encode this (`planner`/`plan-reviewer` → Opus; `implementer`/`codex-reviewer`/
+   `changelog-keeper` → Sonnet). Don't plan on Sonnet or implement on Opus.
 
 ## 2. Version control (strict)
 
@@ -134,6 +139,7 @@ A task is done only when **all** hold:
 - [ ] Conventional, atomic commits on the correct branch.
 - [ ] For non-trivial work: plan exists in `docs/plans/` **with** a Codex review
       appendix, and blocking issues are resolved.
+- [ ] Planning/plan-review ran on **Opus**; execution ran on **Sonnet** (§1.6).
 - [ ] Docs/ADR updated if behavior or architecture changed.
 - [ ] No secrets, no stray files, `offline/` not referenced.
 
