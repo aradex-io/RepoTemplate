@@ -71,16 +71,16 @@ follows.
 
 ```mermaid
 flowchart LR
-    I([idea]) --> P["/plan<br/>docs/plans/"]
-    P --> R{review<br/>backend}
-    R -->|codex exec| A[Appendix:<br/>Plan Review]
-    R -->|advisor / CLI| A
+    I([idea]) --> P["/plan → docs/plans/"]
+    P --> R{"review backend"}
+    R -->|codex exec| A["Appendix: Plan Review"]
+    R -->|fallback CLI| A
     R -->|plan-reviewer agent| A
-    A --> X[resolve<br/>blockers]
-    X --> B[implement<br/>on a branch]
-    B --> T[tests +<br/>CHANGELOG]
-    T --> C[Conventional<br/>commit]
-    C --> M[PR → CI gates → main]
+    A --> X["resolve blockers"]
+    X --> B["implement on a branch"]
+    B --> T["tests + CHANGELOG"]
+    T --> C["Conventional commit"]
+    C --> M["PR → CI gates → main"]
 ```
 
 1. **Plan** non-trivial work → a file in `docs/plans/` (slash command `/plan`).
