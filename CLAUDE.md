@@ -24,11 +24,22 @@ the conflict and stop — do not silently override it.
    tree buildable, tested, documented, and version-controlled.
 5. **Be honest about state.** If tests fail, say so with output. If you skipped a
    step, say that. Never report "done" for work you did not verify.
-6. **Right model for each phase (mandatory).** Plan and review plans with the
-   strongest model — **Opus**. Execute approved, reviewed plans — implementation,
-   changelog edits, mechanical changes — with **Sonnet**. The shipped agents
-   encode this (`planner`/`plan-reviewer` → Opus; `implementer`/`codex-reviewer`/
-   `changelog-keeper` → Sonnet). Don't plan on Sonnet or implement on Opus.
+6. **Triage every task to the right model by complexity (mandatory).** Match the
+   model to the difficulty of the work — spend the strongest models where they
+   change the outcome, and don't burn them on trivia:
+   - **Fable 5** — reserved for the **most complex, advanced, and hardest**
+     problems only: novel algorithms, deep architectural reasoning, subtle
+     multi-system debugging. Reach for it when Opus is genuinely not enough.
+   - **Opus** — **complex reasoning and planning**: writing and reviewing plans,
+     design decisions, and non-trivial analysis.
+   - **Sonnet** — **execution and task implementation**: coding an approved plan,
+     changelog edits, mechanical and routine changes.
+   - **Haiku** — only the **most basic and simplest** tasks, and used
+     **sparingly**.
+   The shipped agents encode the common path (`planner`/`plan-reviewer` → Opus;
+   `implementer`/`codex-reviewer`/`changelog-keeper` → Sonnet). Escalate to
+   Fable 5 for the hardest problems; drop to Haiku only for trivial work. Never
+   plan on Sonnet or implement on Opus.
 
 ## 2. Version control (strict)
 
@@ -55,6 +66,14 @@ These are hard requirements. CI enforces several of them; the rest are on you.
   explicit permission.
 - **No secrets, ever.** No credentials, tokens, `.env`, or private keys in the
   history. If you find one, stop and report it.
+- **Authorship is the maintainer's, always.** Every commit, tag, and PR is
+  authored and attributed to the human maintainer —
+  **`d0sf3t <github@aradex.io>`**. Configure `git` accordingly
+  (`user.name=d0sf3t`, `user.email=github@aradex.io`). **Never** add a
+  `Co-Authored-By: Claude`/Anthropic trailer, a "Generated with Claude Code"
+  line, or any other Claude/Anthropic attribution to a commit message, PR body,
+  or the history. AI agents write on the maintainer's behalf; the maintainer is
+  the sole author of record.
 - **Pull requests are opt-in.** Do not open a PR unless the human explicitly asks.
 
 ## 3. Changelog (mandatory)
@@ -139,7 +158,11 @@ A task is done only when **all** hold:
 - [ ] Conventional, atomic commits on the correct branch.
 - [ ] For non-trivial work: plan exists in `docs/plans/` **with** a Codex review
       appendix, and blocking issues are resolved.
-- [ ] Planning/plan-review ran on **Opus**; execution ran on **Sonnet** (§1.6).
+- [ ] Each task ran on the complexity-appropriate model per §1.6 (Fable 5 for the
+      hardest problems · Opus for reasoning/planning · Sonnet for execution ·
+      Haiku only for trivial work, sparingly).
+- [ ] Commits/PRs attributed to the maintainer (`d0sf3t <github@aradex.io>`); no
+      Claude/Anthropic co-author or "Generated with" attribution anywhere.
 - [ ] Docs/ADR updated if behavior or architecture changed.
 - [ ] No secrets, no stray files, `offline/` not referenced.
 
