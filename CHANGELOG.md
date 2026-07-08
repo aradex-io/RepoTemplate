@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- `commit-lint` CI job no longer fails on the synthetic merge commit GitHub
+  creates for `pull_request` events — it now lints with `git rev-list --no-merges`,
+  so real commits are validated but the auto-generated `Merge …` commit is skipped.
+
 ### Added
 - `docs/` wiki: a low-level reference under `docs/guide/` (plan review, version
   control & changelog, CI/CD & releases, branch protection, scripts, agents),
@@ -21,6 +26,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Mandate model roles by phase: planning/plan-review on **Opus**, execution on
   **Sonnet** (`CLAUDE.md` §1.6 + Definition of done, `AGENTS.md`, and the agents
   guide). The `implementer` agent now runs on Sonnet instead of Opus.
+- Broaden the model mandate into **complexity-based triage**: Fable 5 for the
+  hardest problems, Opus for reasoning/planning, Sonnet for execution, and Haiku
+  only for trivial work (sparingly) — `CLAUDE.md` §1.6 + Definition of done,
+  `AGENTS.md`, and the agents guide.
+- Mandate that **all authorship is attributed to the maintainer**
+  (`d0sf3t <github@aradex.io>`) with **no Claude/Anthropic** co-author or
+  "Generated with" attribution — `CLAUDE.md` §2 + Definition of done, `AGENTS.md`,
+  and the version-control guide.
 
 ## [0.1.0] - 2026-06-07
 

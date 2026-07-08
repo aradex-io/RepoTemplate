@@ -17,8 +17,10 @@ agent follows the same contract a human does.
 ## Agents — `.claude/agents/`
 
 Each agent is a focused role with a minimal toolset. They chain
-**plan → review → implement**. Per CLAUDE.md §1.6, **planning runs on Opus and
-execution runs on Sonnet** — each agent pins its `model` accordingly:
+**plan → review → implement**. Per CLAUDE.md §1.6, tasks are **triaged to a model
+by complexity** — Fable 5 for the hardest problems, **Opus for reasoning and
+planning**, **Sonnet for execution and implementation**, and Haiku only for
+trivial work (sparingly). The agents pin the model for their step accordingly:
 
 | Agent | Model | Tools | Does | Does not |
 |-------|-------|-------|------|----------|

@@ -36,6 +36,10 @@ footer                      # optional: BREAKING CHANGE:, changelog: none, Refs:
 - **Atomic**: one logical change per commit; don't mix a refactor with a feature.
 - **Green**: don't commit code that fails build/lint/tests (unless an explicitly
   marked `wip:` checkpoint that is never pushed to a shared branch).
+- **Authorship**: every commit and PR is attributed to the maintainer —
+  `d0sf3t <github@aradex.io>` (set `user.name`/`user.email` to match). Never add a
+  `Co-Authored-By: Claude`/Anthropic trailer or a "Generated with Claude Code"
+  line; AI agents commit on the maintainer's behalf.
 
 CI validates every commit subject on a PR — see the `commit-lint` job in
 [CI/CD](./ci-cd-and-releases.md).

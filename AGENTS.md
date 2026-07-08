@@ -11,17 +11,24 @@ Tool-neutral operating rules for any AI coding agent in this repo. This mirrors
 - **Surgical changes.** Touch only what the task needs; match existing style; no
   drive-by refactors.
 - **Honesty.** Report real test results. Never claim unverified success.
-- **Right model for each phase (mandatory).** Plan and review plans on the
-  strongest model (**Opus**); execute approved plans (implementation, changelog,
-  mechanical edits) on **Sonnet**. Agents encode this — `planner`/`plan-reviewer`
-  run on Opus, `implementer`/`codex-reviewer`/`changelog-keeper` on Sonnet. Don't
-  plan on Sonnet or implement on Opus.
+- **Triage tasks to the right model by complexity (mandatory).** **Fable 5** —
+  the most complex, advanced, hardest problems only. **Opus** — complex reasoning
+  and planning (write/review plans, design, non-trivial analysis). **Sonnet** —
+  execution and task implementation (code an approved plan, changelog, mechanical
+  edits). **Haiku** — only the most basic/simplest tasks, and sparingly. Agents
+  encode the common path — `planner`/`plan-reviewer` on Opus,
+  `implementer`/`codex-reviewer`/`changelog-keeper` on Sonnet; escalate to Fable 5
+  for the hardest work, drop to Haiku only for trivia. Don't plan on Sonnet or
+  implement on Opus.
 
 ## Version control
 
 - Work on a branch; never commit to `main`/`master` directly.
 - [Conventional Commits](https://www.conventionalcommits.org): `type(scope): subject`.
 - Atomic, green commits. No secrets in history. `git push -u origin <branch>`.
+- **Attribute all authorship to the maintainer** — `d0sf3t <github@aradex.io>`
+  (`user.name`/`user.email`). Never add a `Co-Authored-By: Claude`/Anthropic
+  trailer or a "Generated with Claude Code" line to any commit or PR.
 - No pull requests unless a human explicitly asks.
 
 ## Changelog
