@@ -55,5 +55,5 @@ jobs:
               echo "::error::Non-conventional commit $sha: $subject"
               fail=1
             fi
-          done < <(git rev-list "$base"..HEAD)
+          done < <(git rev-list --no-merges "$base"..HEAD)
           exit $fail

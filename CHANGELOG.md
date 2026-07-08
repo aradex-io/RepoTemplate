@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- `commit-lint` CI job no longer fails on the synthetic merge commit GitHub
+  creates for `pull_request` events — it now lints with `git rev-list --no-merges`,
+  so real commits are validated but the auto-generated `Merge …` commit is skipped.
+
 ### Added
 - `docs/` wiki: a low-level reference under `docs/guide/` (plan review, version
   control & changelog, CI/CD & releases, branch protection, scripts, agents),
