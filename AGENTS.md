@@ -12,14 +12,16 @@ Tool-neutral operating rules for any AI coding agent in this repo. This mirrors
   drive-by refactors.
 - **Honesty.** Report real test results. Never claim unverified success.
 - **Triage tasks to the right model by complexity (mandatory).** **Fable 5** —
-  the most complex, advanced, hardest problems only. **Opus** — complex reasoning
-  and planning (write/review plans, design, non-trivial analysis). **Sonnet** —
-  execution and task implementation (code an approved plan, changelog, mechanical
-  edits). **Haiku** — only the most basic/simplest tasks, and sparingly. Agents
-  encode the common path — `planner`/`plan-reviewer` on Opus,
-  `implementer`/`codex-reviewer`/`changelog-keeper` on Sonnet; escalate to Fable 5
-  for the hardest work, drop to Haiku only for trivia. Don't plan on Sonnet or
-  implement on Opus.
+  the hardest planning and the nuanced big-picture context/analysis work only
+  (understanding a whole codebase to find the real gaps or set direction).
+  **Opus 5** — the default for planning (write/review plans, design, non-trivial
+  analysis) and for complex execution. **Sonnet (latest)** — basic planning for
+  small, well-scoped changes, and pure/straightforward execution (code an
+  approved plan, changelog, mechanical edits). Sonnet is the floor; Haiku is not
+  part of the ladder. Agents encode the common path — `planner`/`plan-reviewer`
+  on Opus 5, `implementer`/`codex-reviewer`/`changelog-keeper` on Sonnet;
+  escalate whole-codebase or direction-setting work to Fable 5 and complex
+  implementation to Opus 5. Never leave hard planning on Sonnet.
 
 ## Version control
 

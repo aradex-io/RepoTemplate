@@ -18,9 +18,11 @@ agent follows the same contract a human does.
 
 Each agent is a focused role with a minimal toolset. They chain
 **plan → review → implement**. Per CLAUDE.md §1.6, tasks are **triaged to a model
-by complexity** — Fable 5 for the hardest problems, **Opus for reasoning and
-planning**, **Sonnet for execution and implementation**, and Haiku only for
-trivial work (sparingly). The agents pin the model for their step accordingly:
+by complexity** — Fable 5 for the hardest planning and whole-codebase,
+direction-setting analysis; **Opus 5 for most planning and for complex
+execution**; **Sonnet for basic planning and straightforward execution**. The
+agents pin the model for their step's common case; escalate when a specific task
+is harder than that case:
 
 | Agent | Model | Tools | Does | Does not |
 |-------|-------|-------|------|----------|
@@ -29,6 +31,10 @@ trivial work (sparingly). The agents pin the model for their step accordingly:
 | [`plan-reviewer`](../../.claude/agents/plan-reviewer.md) | **opus** | Read, Edit | **Fallback reviewer** with no CLI: review the plan and append the same appendix. | Implement; use an interactive Codex session or the bridge/MCP. |
 | [`implementer`](../../.claude/agents/implementer.md) | sonnet | Read, Grep, Glob, Edit, Write, Bash | Implement an approved plan surgically, with tests + changelog. | Start before blockers are resolved; commit to `main`. |
 | [`changelog-keeper`](../../.claude/agents/changelog-keeper.md) | sonnet | Read, Edit, Bash | Keep `CHANGELOG.md` honest; cut SemVer releases. | Invent entries. |
+
+The pinned model is the common case, not a ceiling: run a plan that needs
+whole-codebase, direction-setting judgment on **Fable 5**, and an implementation
+with real cross-module reasoning on **Opus 5**.
 
 ## Slash commands — `.claude/commands/`
 

@@ -26,20 +26,23 @@ the conflict and stop — do not silently override it.
    step, say that. Never report "done" for work you did not verify.
 6. **Triage every task to the right model by complexity (mandatory).** Match the
    model to the difficulty of the work — spend the strongest models where they
-   change the outcome, and don't burn them on trivia:
-   - **Fable 5** — reserved for the **most complex, advanced, and hardest**
-     problems only: novel algorithms, deep architectural reasoning, subtle
-     multi-system debugging. Reach for it when Opus is genuinely not enough.
-   - **Opus** — **complex reasoning and planning**: writing and reviewing plans,
-     design decisions, and non-trivial analysis.
-   - **Sonnet** — **execution and task implementation**: coding an approved plan,
-     changelog edits, mechanical and routine changes.
-   - **Haiku** — only the **most basic and simplest** tasks, and used
-     **sparingly**.
-   The shipped agents encode the common path (`planner`/`plan-reviewer` → Opus;
-   `implementer`/`codex-reviewer`/`changelog-keeper` → Sonnet). Escalate to
-   Fable 5 for the hardest problems; drop to Haiku only for trivial work. Never
-   plan on Sonnet or implement on Opus.
+   change the outcome, and don't burn them on routine work:
+   - **Fable 5** — the **hardest planning** and the **nuanced, big-picture
+     context and analysis** work only: holding an entire codebase in view to
+     work out where the real gaps are, which direction to steer, and which
+     architectural bet to take. Reach for it when Opus 5 is genuinely not enough.
+   - **Opus 5** — the **default for planning** (writing and reviewing plans,
+     design decisions, non-trivial analysis) **and for complex execution**:
+     implementation that needs real reasoning, spans modules, or is likely to
+     surprise you.
+   - **Sonnet (latest)** — **basic planning** for small, well-scoped changes, and
+     **pure/straightforward execution**: coding an approved plan, changelog
+     edits, mechanical and routine changes.
+   Sonnet is the floor; Haiku is not part of this ladder. The shipped agents
+   encode the common path (`planner`/`plan-reviewer` → Opus 5;
+   `implementer`/`codex-reviewer`/`changelog-keeper` → Sonnet). Escalate a
+   whole-codebase or direction-setting question to Fable 5, and a genuinely
+   complex implementation to Opus 5. Never leave hard planning on Sonnet.
 
 ## 2. Version control (strict)
 
@@ -159,8 +162,9 @@ A task is done only when **all** hold:
 - [ ] For non-trivial work: plan exists in `docs/plans/` **with** a Codex review
       appendix, and blocking issues are resolved.
 - [ ] Each task ran on the complexity-appropriate model per §1.6 (Fable 5 for the
-      hardest problems · Opus for reasoning/planning · Sonnet for execution ·
-      Haiku only for trivial work, sparingly).
+      hardest planning and big-picture analysis · Opus 5 for most planning and
+      complex execution · Sonnet for basic planning and straightforward
+      execution).
 - [ ] Commits/PRs attributed to the maintainer (`d0sf3t <github@aradex.io>`); no
       Claude/Anthropic co-author or "Generated with" attribution anywhere.
 - [ ] Docs/ADR updated if behavior or architecture changed.
