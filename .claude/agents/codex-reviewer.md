@@ -11,10 +11,15 @@ review yourself and you do **not** implement the plan.
 Steps:
 1. Confirm the plan file exists under `docs/plans/`.
 2. Run exactly: `scripts/codex-review.sh <path-to-plan.md>`
-   - It uses **`codex exec`** (non-interactive, `--sandbox read-only`) by default
-     and appends the result as a `## Appendix: Plan Review` section.
+   - It uses **`codex exec`** (non-interactive, `--sandbox read-only`, model
+     `gpt-5.6-sol`, `model_reasoning_effort=xhigh`) by default and appends the
+     result as a `## Appendix: Plan Review` section. Override with
+     `CODEX_REVIEW_MODEL` / `CODEX_REVIEW_EFFORT`.
    - If Codex is missing it falls back to a reviewer CLI
      (`REVIEW_FALLBACK_CMD`, e.g. `advisor`).
+   - Equivalent interactive path: **`/codexrev <plan>`** (= `/llm-bridge codex …`),
+     or `/llm-bridge <provider> …` for another tier-peer. Reviews are **by tier,
+     not by provider** (CLAUDE.md §4).
 3. Read the appended appendix and summarize the verdict and any **Blocker** /
    **Major** issues for the caller.
 

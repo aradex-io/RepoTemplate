@@ -17,9 +17,15 @@
 #                  itself. We never fabricate a review.
 #
 # Env:
-#   CODEX_REVIEW_MODEL   model for codex exec       (default: gpt-5.3-codex)
+#   CODEX_REVIEW_MODEL   model for codex exec       (default: gpt-5.6-sol)
+#   CODEX_REVIEW_EFFORT  model_reasoning_effort     (default: xhigh)
+#                        one of: none|minimal|low|medium|high|xhigh|max
 #   REVIEW_BACKEND       force a backend            (default: auto)
 #   REVIEW_FALLBACK_CMD  fallback reviewer command  (default: advisor)
+#
+# Note: the default is gpt-5.6-sol, not gpt-5.3-codex — the codex default fails
+# on ChatGPT-account auth. Override with CODEX_REVIEW_MODEL if you use a different
+# account/model.
 #
 # Usage:
 #   scripts/codex-review.sh docs/plans/2026-06-07-my-feature.md
@@ -33,7 +39,8 @@ if [[ -z "${PLAN_FILE}" ]]; then
 fi
 [[ -f "${PLAN_FILE}" ]] || { echo "error: plan file not found: ${PLAN_FILE}" >&2; exit 1; }
 
-CODEX_MODEL="${CODEX_REVIEW_MODEL:-gpt-5.3-codex}"
+CODEX_MODEL="${CODEX_REVIEW_MODEL:-gpt-5.6-sol}"
+CODEX_EFFORT="${CODEX_REVIEW_EFFORT:-xhigh}"
 REVIEW_BACKEND="${REVIEW_BACKEND:-auto}"
 REVIEW_FALLBACK_CMD="${REVIEW_FALLBACK_CMD:-advisor}"
 
@@ -91,11 +98,12 @@ case "${BACKEND}" in
     echo ">> reviewing ${PLAN_FILE} via codex exec (read-only)..." >&2
     codex exec \
       --model "${CODEX_MODEL}" \
+      -c model_reasoning_effort="${CODEX_EFFORT}" \
       --sandbox read-only \
       --skip-git-repo-check \
       --output-last-message "${TMP_REVIEW}" \
-      "${PROMPT}" >&2
-    LABEL="codex exec (model: ${CODEX_MODEL})"
+      "${PROMPT}" < /dev/null >&2
+    LABEL="codex exec (model: ${CODEX_MODEL}, effort: ${CODEX_EFFORT})"
     ;;
   advisor)
     command -v "${REVIEW_FALLBACK_CMD}" >/dev/null 2>&1 || { echo "error: fallback reviewer '${REVIEW_FALLBACK_CMD}' not found." >&2; exit 127; }

@@ -11,17 +11,20 @@ Tool-neutral operating rules for any AI coding agent in this repo. This mirrors
 - **Surgical changes.** Touch only what the task needs; match existing style; no
   drive-by refactors.
 - **Honesty.** Report real test results. Never claim unverified success.
-- **Triage tasks to the right model by complexity (mandatory).** **Fable 5** —
-  the hardest planning and the nuanced big-picture context/analysis work only
-  (understanding a whole codebase to find the real gaps or set direction).
-  **Opus 5** — the default for planning (write/review plans, design, non-trivial
-  analysis) and for complex execution. **Sonnet (latest)** — basic planning for
-  small, well-scoped changes, and pure/straightforward execution (code an
-  approved plan, changelog, mechanical edits). Sonnet is the floor; Haiku is not
-  part of the ladder. Agents encode the common path — `planner`/`plan-reviewer`
-  on Opus 5, `implementer`/`codex-reviewer`/`changelog-keeper` on Sonnet;
-  escalate whole-codebase or direction-setting work to Fable 5 and complex
-  implementation to Opus 5. Never leave hard planning on Sonnet.
+- **Triage tasks to the right model tier (mandatory) — by tier, not by
+  provider.** **Tier 1 (hardest, most technically intensive):** **Astra 6** or
+  **Fable 5** — whole-codebase, direction-setting, deep-architecture calls; reach
+  here only when Tier 2 is not enough. **Tier 2 (complex reasoning / difficult
+  technical — the default for planning, design, and complex execution):**
+  **Opus 5** (effort `high`/`xhigh`); the peer is **Daybreak Blue** (`xhigh`) for
+  **cyber** work and **Sol 5.6** (extra-high effort) for **non-cyber** work.
+  **Tier 3 (straightforward tasks/implementation):** **Sonnet 5** or **Terra
+  5.6** — code an approved plan, changelog, mechanical edits. Tier 3 is the
+  floor; Haiku is not part of the ladder. Agents encode the common Claude path —
+  `planner`/`plan-reviewer` on Opus 5 (Tier 2), `implementer`/`codex-reviewer`/
+  `changelog-keeper` on Sonnet (Tier 3); escalate whole-codebase or
+  direction-setting work to Tier 1 and complex implementation to Tier 2. Never
+  leave hard planning on a Tier-3 model.
 
 ## Version control
 
@@ -38,16 +41,27 @@ Tool-neutral operating rules for any AI coding agent in this repo. This mirrors
 - Update `CHANGELOG.md` (`Unreleased`) in the **same commit** as any user-visible
   change. Format: [Keep a Changelog](https://keepachangelog.com).
 
-## Plan review via Codex (mandatory for non-trivial work)
+## Plan review by a tier-peer model (mandatory for non-trivial work)
+
+Reviewed **by tier, not by provider**: a second, independent model at the task's
+tier (§ model triage) reviews the plan before implementation — a Tier-2 plan on
+Opus 5 is reviewed by Sol 5.6 (non-cyber) or Daybreak Blue (cyber), and
+vice-versa. Split the plan + review workload ~60/40 in either direction; neither
+model is permanently planner or reviewer. (Replaces the old fixed "Opus plans,
+Codex reviews" split.)
 
 1. Write the plan to `docs/plans/<date>-<slug>.md` (`docs/plans/TEMPLATE.md`).
-2. Review it with: `scripts/codex-review.sh docs/plans/<date>-<slug>.md`
-3. The script runs **`codex exec`** (non-interactive, read-only) and **appends the
-   review to the plan as a `## Appendix: Codex Review` section.**
+2. Review it with **`/codexrev docs/plans/<date>-<slug>.md`** (= `/llm-bridge codex
+   …`, file-handoff to a peer model), or the scriptable equivalent
+   **`scripts/codex-review.sh docs/plans/<date>-<slug>.md`**.
+3. Both run **`codex exec`** (non-interactive, read-only) and produce a review that
+   is appended to the plan as a `## Appendix: Plan Review` section.
 
-Constraints: use `codex exec` only. **Not** an interactive Codex session, **not**
-the Codex bridge / MCP / IDE integration. Codex reviews read-only; it must not
-edit files. The review lives as text in the plan file, committed with the plan.
+Constraints: **non-interactive** and **read-only** only (`codex exec --sandbox
+read-only`, or `/llm-bridge` in its default read-only mode). **Not** an interactive
+session, **not** a Codex/peer MCP server / IDE integration. The reviewer reviews;
+it must not edit files. The review lives as text in the plan file, committed with
+the plan.
 
 ## Layout
 
@@ -57,4 +71,4 @@ edit files. The review lives as text in the plan file, committed with the plan.
 ## Done means
 
 Builds, lints, tests pass; changelog updated; atomic commits on a branch;
-non-trivial work has a Codex-reviewed plan; docs/ADRs updated; no secrets.
+non-trivial work has a tier-peer-reviewed plan; docs/ADRs updated; no secrets.

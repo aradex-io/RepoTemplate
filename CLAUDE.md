@@ -24,25 +24,30 @@ the conflict and stop — do not silently override it.
    tree buildable, tested, documented, and version-controlled.
 5. **Be honest about state.** If tests fail, say so with output. If you skipped a
    step, say that. Never report "done" for work you did not verify.
-6. **Triage every task to the right model by complexity (mandatory).** Match the
-   model to the difficulty of the work — spend the strongest models where they
-   change the outcome, and don't burn them on routine work:
-   - **Fable 5** — the **hardest planning** and the **nuanced, big-picture
-     context and analysis** work only: holding an entire codebase in view to
-     work out where the real gaps are, which direction to steer, and which
-     architectural bet to take. Reach for it when Opus 5 is genuinely not enough.
-   - **Opus 5** — the **default for planning** (writing and reviewing plans,
-     design decisions, non-trivial analysis) **and for complex execution**:
-     implementation that needs real reasoning, spans modules, or is likely to
-     surprise you.
-   - **Sonnet (latest)** — **basic planning** for small, well-scoped changes, and
-     **pure/straightforward execution**: coding an approved plan, changelog
-     edits, mechanical and routine changes.
-   Sonnet is the floor; Haiku is not part of this ladder. The shipped agents
-   encode the common path (`planner`/`plan-reviewer` → Opus 5;
-   `implementer`/`codex-reviewer`/`changelog-keeper` → Sonnet). Escalate a
-   whole-codebase or direction-setting question to Fable 5, and a genuinely
-   complex implementation to Opus 5. Never leave hard planning on Sonnet.
+6. **Triage every task to the right model tier (mandatory).** Match the model to
+   the difficulty of the work — spend the strongest models where they change the
+   outcome, and don't burn them on routine work. Route **by tier, not by
+   provider**: each tier lists interchangeable peers, and cyber vs. non-cyber work
+   selects the right peer *within* a tier.
+   - **Tier 1 — the hardest, most technically intensive work:** **Astra 6** or
+     **Fable 5**. Whole-codebase, direction-setting, deep-architecture calls —
+     holding the entire system in view to work out where the real gaps are and
+     which architectural bet to take. Reach here only when Tier 2 is genuinely
+     not enough.
+   - **Tier 2 — complex reasoning and difficult technical work** (the default for
+     planning, design, non-trivial analysis, and complex execution): **Opus 5**
+     (reasoning effort `high` or `xhigh`, by task weight). For **cyber** work the
+     peer is **Daybreak Blue** (`xhigh`); for **non-cyber** work it is **Sol 5.6**
+     (extra-high effort — codex `model_reasoning_effort=xhigh`).
+   - **Tier 3 — straightforward tasks and straightforward implementation:**
+     **Sonnet 5** or **Terra 5.6**. Coding an approved plan, changelog edits,
+     mechanical and routine changes.
+   Tier 3 is the floor; Haiku is not part of this ladder. The shipped Claude
+   agents encode the common Claude path (`planner`/`plan-reviewer` → Opus 5, i.e.
+   Tier 2; `implementer`/`codex-reviewer`/`changelog-keeper` → Sonnet, i.e.
+   Tier 3). Escalate a whole-codebase or direction-setting question to Tier 1
+   (Astra 6 / Fable 5), and a genuinely complex implementation to Tier 2. Never
+   leave hard planning on a Tier-3 model.
 
 ## 2. Version control (strict)
 
@@ -95,46 +100,63 @@ This repo follows [Keep a Changelog](https://keepachangelog.com) +
 - Releases move `Unreleased` items into a dated, versioned section and bump the
   version per SemVer (feat → minor, fix → patch, breaking → major).
 
-## 4. Plans must be reviewed by Codex (mandatory)
+## 4. Plans must be reviewed by a tier-peer model (mandatory)
 
 Any non-trivial change (new feature, schema/API change, migration, anything
-touching > ~50 lines or multiple modules) **requires a written plan that has been
-reviewed by Codex before implementation begins.**
+touching > ~50 lines or multiple modules) **requires a written plan that a
+second, independent model has reviewed before implementation begins.**
+
+**Review by tier, not by provider.** The reviewer is a peer at the task's tier
+(§1.6) but a *different model from the author*, so the review is genuinely
+independent. A Tier-2 plan drafted on Opus 5 is reviewed by **Sol 5.6**
+(non-cyber) or **Daybreak Blue** (cyber), and vice-versa; a Tier-1 plan alternates
+between **Astra 6** and **Fable 5**. What is mandatory is that *a second tier-peer
+reviews the plan* — never that one fixed provider always does.
+
+**Split the plan + review workload ~60/40, in either direction.** Neither model is
+permanently "the planner" or "the reviewer." Sometimes the Claude model drafts and
+the peer (Sol 5.6 / Daybreak Blue / Gemini) reviews; sometimes the peer drafts and
+Claude reviews. Over a body of work it balances to roughly 60/40 either way. This
+replaces the old fixed "Opus plans, Codex reviews" split.
 
 Workflow:
 
 1. Write the plan to `docs/plans/<YYYY-MM-DD>-<slug>.md` using
    `docs/plans/TEMPLATE.md`. Cover: goal, approach, files touched, test strategy,
    risks, rollout.
-2. Run the review:
-   ```bash
-   scripts/codex-review.sh docs/plans/<YYYY-MM-DD>-<slug>.md
-   ```
-   This invokes **`codex exec`** (OpenAI Codex CLI, non-interactive, read-only
-   sandbox) and **appends the review to the plan file as a `## Appendix: Plan
-   Review` section.**
+2. Get the peer review. Two mechanisms, both **non-interactive** and **read-only**:
+   - **`/codexrev <plan>`** — alias for **`/llm-bridge codex <plan>`**, the primary
+     interactive way to hand a plan to a peer model. `/llm-bridge <provider> …`
+     drives any configured peer (`codex` = Sol 5.6, `gemini`, …) via the
+     **file-handoff** pattern: the peer writes its full review to a known markdown
+     file and we monitor **that file** (poll until it exists and its size is
+     stable) — never its stdout or PID.
+   - **`scripts/codex-review.sh <plan>`** — the scriptable/CI equivalent. Runs
+     **`codex exec`** (read-only) and **appends the review to the plan file as a
+     `## Appendix: Plan Review` section.**
+   Either way, append the returned review to the plan file verbatim as a dated
+   `## Appendix: Plan Review` section, so it is auditable in version control.
 3. **Read the appendix. Address blocking issues** in the plan (revise and, if the
-   plan changed materially, re-run the review). Only then implement.
+   plan changed materially, re-review). Only then implement.
 
-**Fallback when Codex isn't installed** (the review still happens, still as an
+**Fallback when no peer CLI is installed** (the review still happens, still as an
 appendix, still read-only):
 - a fallback reviewer CLI via `REVIEW_FALLBACK_CMD` (e.g. `advisor`) — set it and
-  re-run the script; or
+  re-run `scripts/codex-review.sh`; or
 - the **`plan-reviewer` agent**, which reads the plan and appends the same
   `## Appendix: Plan Review` section itself.
 
 Hard constraints on how the review is produced — do not deviate:
 
-- ✅ Use **`codex exec`** (one-shot, non-interactive). The review is **text
-  appended to the plan markdown file**, recorded in version control alongside the
-  plan.
-- ❌ **Do NOT** open an interactive Codex session / TUI for this.
-- ❌ **Do NOT** use the "Codex bridge" / any Codex MCP server / IDE integration
-  to perform the review.
-- ❌ **Do NOT** let Codex modify files — it runs `--sandbox read-only`. It
-  reviews; it does not implement.
+- ✅ The reviewer runs **non-interactively** and **read-only** (`codex exec
+  --sandbox read-only`, or `/llm-bridge` in its default read-only mode). The review
+  is **text appended to the plan markdown file**, recorded in version control.
+- ❌ **Do NOT** open an interactive Codex/peer session or TUI for this.
+- ❌ **Do NOT** use a Codex/peer MCP server or IDE integration to perform the
+  review — use `codex exec` / the `/llm-bridge` file-handoff.
+- ❌ **Do NOT** let the reviewer modify files — it reviews; it does not implement.
 
-The plan + its Codex appendix are committed together (`docs(plan): ...`) so the
+The plan + its review appendix are committed together (`docs(plan): ...`) so the
 review is auditable in history.
 
 ## 5. Repository layout
@@ -159,12 +181,13 @@ A task is done only when **all** hold:
 - [ ] Tests written/updated and **passing** (`scripts/test.sh`).
 - [ ] `CHANGELOG.md` updated (or honest `changelog: none`).
 - [ ] Conventional, atomic commits on the correct branch.
-- [ ] For non-trivial work: plan exists in `docs/plans/` **with** a Codex review
-      appendix, and blocking issues are resolved.
-- [ ] Each task ran on the complexity-appropriate model per §1.6 (Fable 5 for the
-      hardest planning and big-picture analysis · Opus 5 for most planning and
-      complex execution · Sonnet for basic planning and straightforward
-      execution).
+- [ ] For non-trivial work: plan exists in `docs/plans/` **with** a tier-peer
+      review appendix (§4), and blocking issues are resolved.
+- [ ] Each task ran on the tier-appropriate model per §1.6 (Tier 1 Astra 6 /
+      Fable 5 for the hardest, big-picture work · Tier 2 Opus 5 / Sol 5.6 /
+      Daybreak Blue for complex reasoning and execution · Tier 3 Sonnet 5 /
+      Terra 5.6 for straightforward work), with plan+review split ~60/40 across
+      tier peers.
 - [ ] Commits/PRs attributed to the maintainer (`d0sf3t <github@aradex.io>`); no
       Claude/Anthropic co-author or "Generated with" attribution anywhere.
 - [ ] Docs/ADR updated if behavior or architecture changed.

@@ -8,7 +8,7 @@ model: sonnet
 You are the **implementation** agent. You execute an approved plan.
 
 Preconditions (refuse if unmet):
-- A plan exists in `docs/plans/` with a `## Appendix: Codex Review` and no
+- A plan exists in `docs/plans/` with a `## Appendix: Plan Review` and no
   unresolved Blocker/Major issues.
 - You are on a feature branch, not `main`/`master`.
 

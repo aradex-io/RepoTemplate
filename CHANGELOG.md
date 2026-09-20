@@ -11,8 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `commit-lint` CI job no longer fails on the synthetic merge commit GitHub
   creates for `pull_request` events — it now lints with `git rev-list --no-merges`,
   so real commits are validated but the auto-generated `Merge …` commit is skipped.
+- The `implementer` agent and `/codex-review` command referenced a
+  `## Appendix: Codex Review` section, but `scripts/codex-review.sh` writes
+  `## Appendix: Plan Review`; aligned all references to `## Appendix: Plan Review`
+  so the implementer precondition actually matches.
 
 ### Added
+- Permissive-by-default `.claude/settings.json`: broad tool allow-list
+  (`Bash`, `Edit`, `Write`, `Read`, `WebFetch`, …) with `defaultMode:
+  acceptEdits`, guarded by a `deny` list that still blocks destructive file wipes
+  (`rm -rf` and variants, `shred`, `truncate`), disk/format/mount ops (`dd`,
+  `mkfs*`, `fdisk`, `parted`, `wipefs`, `mount`/`umount`), and system/power/privilege
+  ops (`shutdown`/`reboot`/`poweroff`/`halt`, `chmod -R`/`chown -R`, `kill -9 -1`),
+  plus the existing secret-read denies.
 - `docs/` wiki: a low-level reference under `docs/guide/` (plan review, version
   control & changelog, CI/CD & releases, branch protection, scripts, agents),
   indexed by `docs/README.md`.
@@ -23,14 +34,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Streamlined the README — removed repetition and moved deep detail into the wiki.
-- Mandate **complexity-based model triage** (`CLAUDE.md` §1.6 + Definition of
-  done, `AGENTS.md`, and the agents guide): **Fable 5** only for the hardest
-  planning and nuanced big-picture analysis (understanding a whole codebase to
-  find the gaps or set direction), **Opus 5** for most planning and for complex
-  execution, and **Sonnet** for basic planning and straightforward execution.
-  Sonnet is the floor — Haiku is not part of the ladder. The `implementer` agent
-  runs on Sonnet instead of Opus, and an agent's pinned model is the common case,
-  not a ceiling.
+- Mandate **tier-based model triage** — by tier, **not by provider**
+  (`CLAUDE.md` §1.6 + Definition of done, `AGENTS.md`, and the agents guide):
+  **Tier 1** (hardest, most technically intensive) → **Astra 6** or **Fable 5**;
+  **Tier 2** (complex reasoning / difficult technical, the planning default) →
+  **Opus 5** (`high`/`xhigh`), with **Daybreak Blue** (`xhigh`) for cyber and
+  **Sol 5.6** (extra-high effort) for non-cyber; **Tier 3** (straightforward
+  tasks/implementation) → **Sonnet 5** or **Terra 5.6**. Tier 3 is the floor;
+  Haiku is not part of the ladder. Shipped Claude agents encode the common Claude
+  path (`planner`/`plan-reviewer` → Opus 5; `implementer`/`codex-reviewer`/
+  `changelog-keeper` → Sonnet).
+- Generalize the **plan-review mandate to "review by a tier-peer, not a fixed
+  provider"** (`CLAUDE.md` §4, `AGENTS.md`, agents guide): the reviewer is an
+  independent model at the task's tier (e.g. Opus 5 ↔ Sol 5.6 / Daybreak Blue),
+  and the plan + review workload splits **~60/40 in either direction** — replacing
+  the old fixed "Opus plans, Codex reviews" split.
+- Point the **codex usage at the `/codexrev` / `/llm-bridge` file-handoff commands**
+  as the interactive review path, alongside the scriptable `scripts/codex-review.sh`
+  (`CLAUDE.md` §4, `/codex-review`, `codex-reviewer` agent, agents guide).
+- `scripts/codex-review.sh` now defaults to **model `gpt-5.6-sol`** (the codex
+  default `gpt-5.3-codex` fails on ChatGPT-account auth) and
+  **`model_reasoning_effort=xhigh`**, both overridable via `CODEX_REVIEW_MODEL` /
+  `CODEX_REVIEW_EFFORT`; the `codex exec` invocation closes stdin (`< /dev/null`)
+  so it cannot hang.
 - Mandate that **all authorship is attributed to the maintainer**
   (`d0sf3t <github@aradex.io>`) with **no Claude/Anthropic** co-author or
   "Generated with" attribution — `CLAUDE.md` §2 + Definition of done, `AGENTS.md`,
