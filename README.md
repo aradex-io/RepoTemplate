@@ -34,7 +34,8 @@ the **plan-review step**, which prefers the OpenAI **Codex CLI**.
 |------|-----|-----|
 | **Codex CLI** | Runs `codex exec` to review plans | `npm install -g @openai/codex` |
 | **Codex auth** | Codex must authenticate | `codex login` **or** export `OPENAI_API_KEY` |
-| `CODEX_REVIEW_MODEL` *(optional)* | Pick the review model | default `gpt-5.3-codex` |
+| `CODEX_REVIEW_MODEL` *(optional)* | Pick the review model | default `gpt-5.6-sol` |
+| `CODEX_REVIEW_EFFORT` *(optional)* | Reasoning effort | default `xhigh` (`none`…`max`) |
 | `git` + Bash | Everything else | already on your machine |
 
 ```bash

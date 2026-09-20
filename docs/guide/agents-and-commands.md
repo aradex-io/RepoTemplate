@@ -17,12 +17,13 @@ agent follows the same contract a human does.
 ## Agents — `.claude/agents/`
 
 Each agent is a focused role with a minimal toolset. They chain
-**plan → review → implement**. Per CLAUDE.md §1.6, tasks are **triaged to a model
-by complexity** — Fable 5 for the hardest planning and whole-codebase,
-direction-setting analysis; **Opus 5 for most planning and for complex
-execution**; **Sonnet for basic planning and straightforward execution**. The
-agents pin the model for their step's common case; escalate when a specific task
-is harder than that case:
+**plan → review → implement**. Per CLAUDE.md §1.6, tasks are **triaged by tier,
+not by provider** — **Tier 1** (hardest, whole-codebase/direction-setting) → Astra
+6 or Fable 5; **Tier 2** (complex reasoning, the planning default) → Opus 5, with
+Daybreak Blue (cyber) / Sol 5.6 (non-cyber) as peers; **Tier 3** (straightforward
+work) → Sonnet 5 or Terra 5.6. These Claude agents pin the Claude model for their
+step's common case (Tier 2 → `opus`, Tier 3 → `sonnet`); escalate when a specific
+task is harder than that case:
 
 | Agent | Model | Tools | Does | Does not |
 |-------|-------|-------|------|----------|
@@ -32,9 +33,10 @@ is harder than that case:
 | [`implementer`](../../.claude/agents/implementer.md) | sonnet | Read, Grep, Glob, Edit, Write, Bash | Implement an approved plan surgically, with tests + changelog. | Start before blockers are resolved; commit to `main`. |
 | [`changelog-keeper`](../../.claude/agents/changelog-keeper.md) | sonnet | Read, Edit, Bash | Keep `CHANGELOG.md` honest; cut SemVer releases. | Invent entries. |
 
-The pinned model is the common case, not a ceiling: run a plan that needs
-whole-codebase, direction-setting judgment on **Fable 5**, and an implementation
-with real cross-module reasoning on **Opus 5**.
+The pinned model is the common case, not a ceiling: escalate a plan that needs
+whole-codebase, direction-setting judgment to **Tier 1** (Astra 6 / Fable 5), and
+an implementation with real cross-module reasoning to **Tier 2** (Opus 5). Plan +
+review split ~60/40 across tier peers, in either direction (CLAUDE.md §4).
 
 ## Slash commands — `.claude/commands/`
 
