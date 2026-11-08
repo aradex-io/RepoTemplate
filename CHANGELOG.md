@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   so real commits are validated but the auto-generated `Merge …` commit is skipped.
 
 ### Added
+- Memory rule (`CLAUDE.md` §8, `AGENTS.md`): durable agent memory lives in the
+  claude-mem database. Agents query it on demand through its MCP tools
+  (`search` → `timeline` → `get_observations`), save deliberate items through the
+  worker's `/api/memory/save` endpoint, and never store secrets. `References`
+  moves to §9.
+
 - `docs/` wiki: a low-level reference under `docs/guide/` (plan review, version
   control & changelog, CI/CD & releases, branch protection, scripts, agents),
   indexed by `docs/README.md`.
