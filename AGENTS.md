@@ -49,6 +49,18 @@ Constraints: use `codex exec` only. **Not** an interactive Codex session, **not*
 the Codex bridge / MCP / IDE integration. Codex reviews read-only; it must not
 edit files. The review lives as text in the plan file, committed with the plan.
 
+## Memory
+
+- Durable memory lives in the **claude-mem** database (`CLAUDE.md` §8), not in
+  notes files. Search it before non-trivial work.
+- Save only deliberate, important items: decisions, non-obvious gotchas, measured
+  environment facts, and state not recorded elsewhere. Date each one and give the
+  why and how to apply. Never save secrets.
+- Without the claude-mem MCP tools, use the worker's HTTP API: read with
+  `GET /api/search?query=…` and write with `POST /api/memory/save`
+  (`{title, text, project}`). The port is `CLAUDE_MEM_WORKER_PORT` in
+  `~/.claude-mem/settings.json`.
+
 ## Layout
 
 `src/` source · `tests/` tests · `docs/` docs & plans · `scripts/` automation ·

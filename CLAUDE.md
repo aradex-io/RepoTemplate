@@ -183,7 +183,41 @@ call these, not raw tool invocations.
 | `scripts/codex-review.sh PLAN`  | Codex review of a plan → appendix     |
 | `scripts/check-changelog.sh`    | Verify changelog was updated          |
 
-## 8. References (read on demand)
+## 8. Memory (claude-mem)
+
+Durable memory lives in the **claude-mem** database, not in `MEMORY.md` or ad-hoc
+notes files. Query it when you need it instead of loading everything up front.
+Automatic capture of every tool call is off, so the store holds only what someone
+saved on purpose. Keep it that way.
+
+- **Read before non-trivial work.** Use the claude-mem MCP tools in three steps:
+  `search` (a compact index of IDs) → `timeline` (context around a hit) →
+  `get_observations` (full text, only for the IDs you need). If the tools are
+  deferred, load them first (ToolSearch `claude-mem`).
+- **Save what is worth keeping:** owner decisions and directives, non-obvious
+  gotchas, measured facts about the environment, and state that code, git, docs
+  and the changelog do not already record. One fact per memory, dated
+  (`08NOV2026`), with a **Why:** and a **How to apply:** line.
+- **Never save** secrets, credentials or tokens (the store is plain text), or
+  anything the repo already records.
+- **How to save.** The MCP server has no write tool, so use the worker's HTTP API:
+
+  ```bash
+  PORT=$(jq -r '.CLAUDE_MEM_WORKER_PORT // "37777"' ~/.claude-mem/settings.json)
+  jq -n --arg t "<title, at most 60 chars>" \
+        --arg x "<the fact, dated. Why: … How to apply: …>" \
+        --arg p "<repo name>" '{title:$t,text:$x,project:$p}' |
+    curl -s -X POST "http://127.0.0.1:$PORT/api/memory/save" \
+         -H 'Content-Type: application/json' -d @-
+  ```
+
+  A successful save answers `"Memory saved as observation #<id>"`.
+- **Correcting a memory.** There is no update or delete. Save a new memory that
+  names the old `#<id>` and says what changed and which one wins.
+- If claude-mem is not installed or the worker does not answer, say so and ask
+  the maintainer where to record the item. Do not start a parallel notes file.
+
+## 9. References (read on demand)
 
 - `AGENTS.md` — tool-neutral version of these rules.
 - `VERSIONING.md` — Conventional Commits + SemVer + release process in detail.
